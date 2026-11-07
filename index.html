@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5G Fábrica Challenge</title>
+<style>
+:root{
+  --bg:#0a0f1e; --panel:#131b33; --panel2:#1b2545; --text:#eef2ff; --muted:#93a0c8;
+  --accent:#22d3ee; --accent2:#e879f9; --ok:#22c55e; --bad:#ef4444;
+  --c0:#dc2626; --c1:#2563eb; --c2:#b45309; --c3:#15803d;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:radial-gradient(1200px 600px at 80% -10%,#1c2a5a 0%,transparent 60%),var(--bg);color:var(--text);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.35}
+#app{max-width:1100px;margin:0 auto;padding:16px}
+h1,h2,h3{margin:.2em 0}
+.brand{font-weight:800;letter-spacing:.04em;color:var(--accent)}
+.brand b{color:var(--accent2)}
+.card{background:var(--panel);border:1px solid #243158;border-radius:16px;padding:20px}
+.center{text-align:center}
+.muted{color:var(--muted)}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:14px 22px;font-weight:700;color:#06121f;
+  background:linear-gradient(90deg,var(--accent),#67e8f9)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.ghost{background:transparent;color:var(--muted);border:1px solid #2d3a66}
+input{font:inherit;width:100%;padding:14px;border-radius:12px;border:1px solid #2d3a66;background:#0d1530;color:var(--text);font-size:1.1rem}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.spread{justify-content:space-between}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+.chip{background:var(--panel2);border:1px solid #2d3a66;padding:6px 12px;border-radius:999px;font-weight:600}
+.timer{height:10px;background:#0d1530;border-radius:99px;overflow:hidden;margin:10px 0}
+.timer>i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .25s linear}
+.qtext{font-size:clamp(1.3rem,3.2vw,2.2rem);font-weight:800;margin:14px 0}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{display:flex;align-items:center;gap:12px;border-radius:14px;padding:16px;color:#fff;font-weight:700;font-size:clamp(1rem,2.2vw,1.35rem);
+  text-align:left;min-height:84px;border:3px solid transparent;position:relative;overflow:hidden}
+.opt .sh{font-size:1.6rem;opacity:.9;flex:none}
+.opt.c0{background:var(--c0)}.opt.c1{background:var(--c1)}.opt.c2{background:var(--c2)}.opt.c3{background:var(--c3)}
+button.opt{background:var(--c0);color:#fff}
+button.opt.c1{background:var(--c1)}button.opt.c2{background:var(--c2)}button.opt.c3{background:var(--c3)}
+.opt.dim{opacity:.35}
+.opt.right{border-color:#fff;box-shadow:0 0 0 4px var(--ok)}
+.opt .cnt{margin-left:auto;font-size:1.6rem;font-weight:800;flex:none}
+.opt .fill{position:absolute;left:0;bottom:0;height:6px;background:rgba(255,255,255,.7)}
+.big{font-size:clamp(2rem,7vw,4rem);font-weight:800}
+.lb{list-style:none;margin:0;padding:0;counter-reset:n}
+.lb li{display:flex;gap:12px;padding:10px 14px;border-radius:12px;background:var(--panel2);margin:6px 0;align-items:center}
+.lb li .pos{width:2ch;font-weight:800;color:var(--accent)}
+.lb li .nm{flex:1;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb li .pt{font-weight:800}
+.lb li.me{outline:2px solid var(--accent2)}
+.lb li .gain{color:var(--ok);font-size:.9rem;font-weight:700}
+.podium{display:flex;gap:12px;align-items:flex-end;justify-content:center;margin:20px 0}
+.podium div{flex:1;max-width:220px;border-radius:14px 14px 0 0;padding:14px 8px;text-align:center;background:var(--panel2)}
+.podium .p1{height:190px;background:linear-gradient(#f59e0b,#b45309)}
+.podium .p2{height:150px;background:linear-gradient(#94a3b8,#475569)}
+.podium .p3{height:120px;background:linear-gradient(#d97706,#78350f)}
+.podium b{display:block;font-size:1.2rem;overflow:hidden;text-overflow:ellipsis}
+.qr{background:#fff;padding:10px;border-radius:12px;display:inline-block}
+.url{font-family:ui-monospace,Menlo,monospace;color:var(--accent);word-break:break-all}
+table{width:100%;border-collapse:collapse}
+td,th{padding:8px;text-align:left;border-bottom:1px solid #243158}
+.bar{height:10px;border-radius:99px;background:#0d1530;overflow:hidden;min-width:80px}
+.bar i{display:block;height:100%;background:var(--ok)}
+.badge{display:inline-block;padding:3px 10px;border-radius:99px;background:#3b2a0a;color:#fbbf24;font-size:.8rem;font-weight:700}
+.good{color:var(--ok)}.badc{color:var(--bad)}
+@media (max-width:640px){.opts{grid-template-columns:1fr}.opt{min-height:68px}}
+@media (prefers-reduced-motion:reduce){.timer>i{transition:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="firebase-config.js" onerror="window.FIREBASE_CONFIG=null"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" onerror="void 0"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js" onerror="void 0"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" onerror="void 0"></script>
+<script>
+/* ======================= PREGUNTAS (basadas en la presentación y el guion) ======================= */
+const LIMIT = 20; // segundos por pregunta
+const QUESTIONS = [
+ {q:"¿Cuál es la latencia mínima teórica del 5G?", o:["50 ms","10 ms","1 ms","100 ms"], a:2,
+  e:"El estándar IMT-2020 fija hasta 1 ms de latencia: clave para controlar procesos en tiempo real."},
+ {q:"¿Qué generación fue la primera pensada también para conectar máquinas, no solo personas?", o:["3G","4G","2G","5G"], a:3,
+  e:"El 5G pasa de conectar personas a conectar procesos productivos (comunicaciones máquina a máquina)."},
+ {q:"Un robot colaborativo que necesita control en tiempo real y muy fiable usa el pilar…", o:["eMBB","URLLC","mMTC","MIMO"], a:1,
+  e:"URLLC = comunicaciones ultrafiables y de baja latencia: robots, vehículos autónomos, cirugía remota."},
+ {q:"Miles de sensores de bajo consumo para mantenimiento predictivo en una zona de la planta corresponden a…", o:["mMTC (IoT masivo)","eMBB","URLLC","Edge computing"], a:0,
+  e:"mMTC permite hasta 1 millón de dispositivos por km², ideal para sensorización masiva."},
+ {q:"¿Qué permite el network slicing?", o:["Cortar cables de red","Crear redes virtuales dedicadas sobre la misma infraestructura","Aumentar el número de antenas","Guardar datos en la nube"], a:1,
+  e:"Por ejemplo, una «rebanada» para los robots y otra para las cámaras, cada una con prestaciones garantizadas."},
+ {q:"El edge computing reduce la latencia porque…", o:["Usa fibra óptica","Cifra todos los datos","Procesa los datos cerca de la máquina","Usa más ancho de banda"], a:2,
+  e:"Procesar en el borde evita enviar el dato lejos: decisión en milisegundos."},
+ {q:"Massive MIMO consiste en…", o:["Usar muchas antenas para más capacidad y cobertura","Mezclar redes 4G y 5G","Un tipo de sensor industrial","Una nube privada"], a:0,
+  e:"Muchas antenas de transmisión y recepción: más capacidad y mejor cobertura."},
+ {q:"Si el 4G tiene unos 50 ms de latencia y el 5G 1 ms, ¿cuántas veces es menor en 5G?", o:["10 veces","50 veces","5 veces","1000 veces"], a:1,
+  e:"50 ms / 1 ms = 50 veces. Son valores teóricos aproximados; en la práctica dependen de banda y red."},
+ {q:"¿Qué ventaja principal da una red 5G privada (campus) a una empresa?", o:["Es gratis","Funciona sin antenas","Control propio de cobertura, seguridad y calidad de servicio","Sustituye a los sensores"], a:2,
+  e:"Los datos se quedan en la planta y la empresa decide cobertura, seguridad y QoS."},
+ {q:"¿Cuál es el flujo correcto del dato en una fábrica conectada?", o:[
+   "Nube → Edge → Red 5G → Máquinas",
+   "Máquinas y sensores → Red 5G privada → Edge computing → Nube / MES / ERP",
+   "Máquinas → Nube → Edge → Red 5G",
+   "Edge → Máquinas → ERP → Red 5G"], a:1,
+  e:"Del sensor a la decisión en milisegundos, y de ahí a la gestión (MES / ERP)."}
+];
+const SHAPES = ["▲","◆","●","■"];
+
+/* ======================= CAPA DE DATOS (Firebase o modo demo local) ======================= */
+const useFB = !!(window.FIREBASE_CONFIG && window.firebase);
+let DB;
+if (useFB) {
+  firebase.initializeApp(window.FIREBASE_CONFIG);
+  const fdb = firebase.database(), root = fdb.ref("game5g");
+  let offset = 0;
+  fdb.ref(".info/serverTimeOffset").on("value", s => offset = s.val() || 0);
+  DB = {
+    now: () => Date.now() + offset,
+    set: (p, v) => (p ? root.child(p) : root).set(v),
+    sub: cb => root.on("value", s => cb(s.val() || {}))
+  };
+} else {
+  const K = "g5demo", cbs = [];
+  const get = () => { try { return JSON.parse(localStorage.getItem(K) || "{}"); } catch (e) { return {}; } };
+  const put = g => { localStorage.setItem(K, JSON.stringify(g)); cbs.forEach(f => f(g)); };
+  DB = {
+    now: () => Date.now(),
+    set: (p, v) => {
+      if (!p) return put(v || {});
+      const g = get(), ks = p.split("/"); let o = g;
+      ks.slice(0, -1).forEach(k => o = (o[k] = o[k] || {}));
+      const last = ks[ks.length - 1]; if (v === null) delete o[last]; else o[last] = v;
+      put(g);
+    },
+    sub: cb => { cbs.push(cb); cb(get()); window.addEventListener("storage", e => { if (e.key === K) cb(get()); }); }
+  };
+}
+
+/* ======================= UTILIDADES ======================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const isHost = location.hash === "#host";
+let G = {};               // último estado conocido
+let viewKey = "";         // para no re-renderizar innecesariamente en jugador
+const app = $("#app");
+
+function ranking(g) {
+  return Object.entries(g.players || {}).map(([id, p]) => ({id, name: p.name, score: p.score || 0, pts: p.pts || 0}))
+    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
+}
+function answersOf(g, q) { return (g.answers || {})[q] || {}; }
+function counts(g, q) {
+  const c = [0, 0, 0, 0]; Object.values(answersOf(g, q)).forEach(a => { if (a.c >= 0 && a.c < 4) c[a.c]++; }); return c;
+}
+function optsHTML(q, {counts: c, reveal, total} = {}) {
+  return `<div class="opts">` + q.o.map((t, i) => {
+    const cls = `opt c${i}` + (reveal ? (i === q.a ? " right" : " dim") : "");
+    const extra = c ? `<span class="cnt">${c[i]}</span><span class="fill" style="width:${total ? Math.round(100 * c[i] / total) : 0}%"></span>` : "";
+    return `<div class="${cls}"><span class="sh">${SHAPES[i]}</span><span>${esc(t)}</span>${extra}</div>`;
+  }).join("") + `</div>`;
+}
+function leaderHTML(list, n, meId) {
+  return `<ol class="lb">` + list.slice(0, n).map((p, i) =>
+    `<li class="${p.id === meId ? "me" : ""}"><span class="pos">${i + 1}</span><span class="nm">${esc(p.name)}</span>` +
+    `${p.pts ? `<span class="gain">+${p.pts}</span>` : ""}<span class="pt">${p.score}</span></li>`).join("") + `</ol>`;
+}
+function tick() {
+  const st = G.state; if (!st || st.status !== "question") return;
+  const left = Math.max(0, LIMIT - (DB.now() - st.t0) / 1000);
+  const bar = $("#bar"), sec = $("#sec");
+  if (bar) bar.style.width = (100 * left / LIMIT) + "%";
+  if (sec) sec.textContent = Math.ceil(left);
+  if (isHost) autoReveal(left);
+}
+setInterval(tick, 250);
+
+/* ======================= PRESENTADOR ======================= */
+let revealedFor = -1;
+function autoReveal(left) {
+  const st = G.state, n = Object.keys(G.players || {}).length, a = Object.keys(answersOf(G, st.q)).length;
+  if ((left <= 0 || (n > 0 && a >= n)) && revealedFor !== st.q) reveal();
+}
+function startQuestion(i) { revealedFor = -1; DB.set("state", {status: "question", q: i, t0: DB.now()}); }
+function reveal() {
+  const st = G.state; if (!st || st.status !== "question" || revealedFor === st.q) return;
+  revealedFor = st.q;
+  const q = QUESTIONS[st.q], ans = answersOf(G, st.q);
+  Object.entries(G.players || {}).forEach(([id, p]) => {
+    const a = ans[id]; let pts = 0;
+    if (a && a.c === q.a) pts = Math.round(500 + 500 * (1 - Math.min(Math.max(a.ms, 0), LIMIT * 1000) / (LIMIT * 1000)));
+    DB.set(`players/${id}/pts`, pts);
+    DB.set(`players/${id}/score`, (p.score || 0) + pts);
+  });
+  DB.set("state", {status: "reveal", q: st.q, t0: st.t0});
+}
+function next() {
+  const q = G.state.q + 1;
+  if (q < QUESTIONS.length) startQuestion(q); else DB.set("state", {status: "end", q: G.state.q, t0: 0});
+}
+function resetGame() { if (confirm("¿Borrar jugadores y resultados y volver al lobby?")) { revealedFor = -1; DB.set("", {state: {status: "lobby"}}); } }
+window.H = {start: () => startQuestion(0), reveal, next, resetGame};
+
+function renderHost(g) {
+  const st = g.state || {status: "lobby"}, list = ranking(g), n = list.length;
+  const head = `<div class="row spread"><div class="brand">5G <b>FÁBRICA</b> CHALLENGE</div>
+    <div class="row"><span class="chip">👥 ${n} jugadores</span>${useFB ? "" : '<span class="badge">MODO DEMO (sin Firebase)</span>'}</div></div>`;
+  if (st.status === "lobby") {
+    const url = location.origin + location.pathname;
+    app.innerHTML = head + `<div class="card center" style="margin-top:16px">
+      <h1 class="big">Entra y juega</h1>
+      <p class="muted">Abre este enlace en tu móvil o escanea el QR</p>
+      <div class="qr" id="qr"></div>
+      <p class="url" style="font-size:1.3rem">${esc(url)}</p>
+      <div class="chips">${list.map(p => `<span class="chip">${esc(p.name)}</span>`).join("") || '<span class="muted">Esperando jugadores…</span>'}</div>
+      <p style="margin-top:20px"><button ${n ? "" : "disabled"} onclick="H.start()">▶ Empezar (${QUESTIONS.length} preguntas)</button></p></div>`;
+    if (window.QRCode) new QRCode($("#qr"), {text: url, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M});
+    return;
+  }
+  if (st.status === "end") return renderEnd(g, head, list);
+  const q = QUESTIONS[st.q], c = counts(g, st.q), a = Object.keys(answersOf(g, st.q)).length;
+  if (st.status === "question") {
+    app.innerHTML = head + `<div class="card" style="margin-top:16px">
+      <div class="row spread"><span class="muted">Pregunta ${st.q + 1} / ${QUESTIONS.length}</span><span class="big" id="sec">${LIMIT}</span></div>
+      <div class="timer"><i id="bar"></i></div>
+      <div class="qtext">${esc(q.q)}</div>${optsHTML(q)}
+      <div class="row spread" style="margin-top:16px"><span class="chip">Respuestas: ${a} / ${n}</span>
+      <button onclick="H.reveal()">Mostrar resultado</button></div></div>`;
+    tick();
+  } else { // reveal
+    app.innerHTML = head + `<div class="card" style="margin-top:16px">
+      <span class="muted">Pregunta ${st.q + 1} / ${QUESTIONS.length}</span>
+      <div class="qtext">${esc(q.q)}</div>${optsHTML(q, {counts: c, reveal: true, total: a || 1})}
+      <p style="margin:16px 0"><b class="good">✔ ${esc(q.o[q.a])}.</b> ${esc(q.e)}</p>
+      <div class="row spread"><h3>Clasificación</h3>
+      <button onclick="H.next()">${st.q + 1 < QUESTIONS.length ? "Siguiente pregunta ▶" : "Ver resultados finales 🏆"}</button></div>
+      ${leaderHTML(list, 5)}</div>`;
+  }
+}
+function renderEnd(g, head, list) {
+  const pod = [1, 0, 2].map(i => list[i] ? `<div class="p${i + 1}"><span style="font-size:2rem">${["🥇","🥈","🥉"][i]}</span><b>${esc(list[i].name)}</b>${list[i].score} pts</div>` : "").join("");
+  const stats = QUESTIONS.map((q, i) => {
+    const ans = answersOf(g, i), tot = Object.keys(ans).length, ok = Object.values(ans).filter(a => a.c === q.a).length;
+    const pct = tot ? Math.round(100 * ok / tot) : 0;
+    return `<tr><td>${i + 1}</td><td>${esc(q.q)}</td><td style="width:140px"><div class="bar"><i style="width:${pct}%"></i></div></td><td><b>${pct}%</b></td></tr>`;
+  }).join("");
+  app.innerHTML = head + `<div class="card center" style="margin-top:16px"><h1 class="big">🏆 Resultados finales</h1><div class="podium">${pod}</div></div>
+    <div class="card" style="margin-top:16px"><h3>Clasificación completa</h3>${leaderHTML(list, 50)}</div>
+    <div class="card" style="margin-top:16px"><h3>% de aciertos por pregunta</h3><table>${stats}</table></div>
+    <p class="center"><button class="ghost" onclick="H.resetGame()">Reiniciar juego</button></p>`;
+}
+
+/* ======================= JUGADOR ======================= */
+let pid = null;
+try { pid = localStorage.getItem("g5pid"); } catch (e) {}
+if (!pid) { pid = "p" + Math.random().toString(36).slice(2, 10); try { localStorage.setItem("g5pid", pid); } catch (e) {} }
+function join() {
+  const name = $("#nm").value.trim().slice(0, 16); if (!name) return $("#nm").focus();
+  try { localStorage.setItem("g5name", name); } catch (e) {}
+  DB.set("players/" + pid, {name, score: 0, pts: 0});
+}
+function answer(i) {
+  const st = G.state; if (!st || st.status !== "question") return;
+  if (answersOf(G, st.q)[pid]) return;
+  DB.set(`answers/${st.q}/${pid}`, {c: i, ms: Math.max(0, DB.now() - st.t0)});
+}
+window.P = {join, answer};
+
+function renderPlayer(g) {
+  const me = (g.players || {})[pid], st = g.state || {status: "lobby"};
+  const top = `<div class="center brand" style="margin:6px 0 14px">5G <b>FÁBRICA</b> CHALLENGE</div>`;
+  let key, html;
+  if (!me) {
+    key = "join";
+    let saved = ""; try { saved = localStorage.getItem("g5name") || ""; } catch (e) {}
+    html = `<div class="card"><h2>¿Cómo te llamas?</h2><p class="muted">Pon un nombre o apodo para el ranking.</p>
+      <input id="nm" maxlength="16" placeholder="Tu nombre" value="${esc(saved)}" autocomplete="off">
+      <p><button style="width:100%" onclick="P.join()">Entrar al juego</button></p></div>`;
+  } else if (st.status === "lobby") {
+    key = "wait"; html = `<div class="card center"><h2>¡Dentro, ${esc(me.name)}!</h2><p class="muted">Espera a que el presentador empiece…</p><p class="big">📡</p></div>`;
+  } else if (st.status === "question") {
+    const q = QUESTIONS[st.q], mine = answersOf(g, st.q)[pid];
+    key = `q${st.q}:${mine ? "a" + mine.c : "n"}`;
+    if (mine) {
+      html = `<div class="card center"><h2>Respuesta enviada</h2><p class="muted">Pregunta ${st.q + 1} / ${QUESTIONS.length}</p>
+        <p class="big">${SHAPES[mine.c]}</p><p class="muted">Espera al resultado…</p></div>`;
+    } else {
+      html = `<div class="card"><div class="row spread"><span class="muted">Pregunta ${st.q + 1} / ${QUESTIONS.length}</span><b id="sec">${LIMIT}</b></div>
+        <div class="timer"><i id="bar"></i></div><div class="qtext" style="font-size:1.3rem">${esc(q.q)}</div>
+        <div class="opts">${q.o.map((t, i) => `<button class="opt c${i}" onclick="P.answer(${i})"><span class="sh">${SHAPES[i]}</span><span>${esc(t)}</span></button>`).join("")}</div></div>`;
+    }
+  } else if (st.status === "reveal") {
+    const q = QUESTIONS[st.q], mine = answersOf(g, st.q)[pid], ok = mine && mine.c === q.a;
+    const list = ranking(g), pos = list.findIndex(p => p.id === pid) + 1;
+    key = `r${st.q}:${me.score}`;
+    html = `<div class="card center"><p class="big">${mine ? (ok ? "✅" : "❌") : "⏱️"}</p>
+      <h2 class="${ok ? "good" : "badc"}">${mine ? (ok ? "¡Correcto! +" + me.pts : "Incorrecto") : "Sin respuesta"}</h2>
+      <p class="muted">Respuesta correcta: <b style="color:var(--text)">${esc(q.o[q.a])}</b></p>
+      <p>${esc(q.e)}</p><p><span class="chip">Puesto ${pos}º</span> <span class="chip">${me.score} pts</span></p></div>`;
+  } else {
+    const list = ranking(g), pos = list.findIndex(p => p.id === pid) + 1;
+    key = "end:" + me.score;
+    html = `<div class="card center"><h2>Fin del juego</h2><p class="big">${pos <= 3 ? ["🥇","🥈","🥉"][pos - 1] : "🎉"}</p>
+      <p>Has quedado <b>${pos}º</b> de ${list.length} con <b>${me.score}</b> puntos.</p>${leaderHTML(list, 5, pid)}</div>`;
+  }
+  if (key !== viewKey) { viewKey = key; app.innerHTML = top + html; if (key === "join") setTimeout(() => { const i = $("#nm"); i && i.focus(); }, 50); }
+  tick();
+}
+
+/* ======================= ARRANQUE ======================= */
+if (isHost && !useFB) console.info("Modo demo: sin firebase-config.js los datos solo se comparten entre pestañas del mismo navegador.");
+DB.sub(g => { G = g; isHost ? renderHost(g) : renderPlayer(g); });
+window.addEventListener("hashchange", () => location.reload());
+</script>
+</body>
+</html>
