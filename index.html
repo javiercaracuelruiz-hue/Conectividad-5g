@@ -44,6 +44,7 @@ button.opt.c1{background:var(--c1)}button.opt.c2{background:var(--c2)}button.opt
 .opt.right{border-color:#fff;box-shadow:0 0 0 4px var(--ok)}
 .opt .cnt{margin-left:auto;font-size:1.6rem;font-weight:800;flex:none}
 .opt .fill{position:absolute;left:0;bottom:0;height:6px;background:rgba(255,255,255,.7)}
+.qimg{display:block;max-width:100%;max-height:260px;margin:0 auto 14px;border-radius:12px;object-fit:contain;background:#0d1530}
 .big{font-size:clamp(2rem,7vw,4rem);font-weight:800}
 .lb{list-style:none;margin:0;padding:0;counter-reset:n}
 .lb li{display:flex;gap:12px;padding:10px 14px;border-radius:12px;background:var(--panel2);margin:6px 0;align-items:center}
@@ -81,26 +82,28 @@ td,th{padding:8px;text-align:left;border-bottom:1px solid #243158}
 <script>
 /* ======================= PREGUNTAS (basadas en la presentación y el guion) ======================= */
 const LIMIT = 20; // segundos por pregunta
+// Cada pregunta puede llevar una imagen opcional: img:"https://..." (enlace de internet) o img:"img/latencia.jpg" (archivo subido al repositorio).
+// Recomendado: subir las imágenes a una carpeta "img" del repositorio, así no dependen de otra web.
 const QUESTIONS = [
- {q:"¿Cuál es la latencia mínima teórica del 5G?", o:["50 ms","10 ms","1 ms","100 ms"], a:2,
+ {img:"img/q1_latencia.svg", q:"¿Cuál es la latencia mínima teórica del 5G?", o:["50 ms","10 ms","1 ms","100 ms"], a:2,
   e:"El estándar IMT-2020 fija hasta 1 ms de latencia: clave para controlar procesos en tiempo real."},
- {q:"¿Qué generación fue la primera pensada también para conectar máquinas, no solo personas?", o:["3G","4G","2G","5G"], a:3,
+ {img:"img/q2_generaciones.svg", q:"¿Qué generación fue la primera pensada también para conectar máquinas, no solo personas?", o:["3G","4G","2G","5G"], a:3,
   e:"El 5G pasa de conectar personas a conectar procesos productivos (comunicaciones máquina a máquina)."},
- {q:"Un robot colaborativo que necesita control en tiempo real y muy fiable usa el pilar…", o:["eMBB","URLLC","mMTC","MIMO"], a:1,
+ {img:"img/q3_robot.svg", q:"Un robot colaborativo que necesita control en tiempo real y muy fiable usa el pilar…", o:["eMBB","URLLC","mMTC","MIMO"], a:1,
   e:"URLLC = comunicaciones ultrafiables y de baja latencia: robots, vehículos autónomos, cirugía remota."},
- {q:"Miles de sensores de bajo consumo para mantenimiento predictivo en una zona de la planta corresponden a…", o:["mMTC (IoT masivo)","eMBB","URLLC","Edge computing"], a:0,
+ {img:"img/q4_sensores.svg", q:"Miles de sensores de bajo consumo para mantenimiento predictivo en una zona de la planta corresponden a…", o:["mMTC (IoT masivo)","eMBB","URLLC","Edge computing"], a:0,
   e:"mMTC permite hasta 1 millón de dispositivos por km², ideal para sensorización masiva."},
- {q:"¿Qué permite el network slicing?", o:["Cortar cables de red","Crear redes virtuales dedicadas sobre la misma infraestructura","Aumentar el número de antenas","Guardar datos en la nube"], a:1,
+ {img:"img/q5_slicing.svg", q:"¿Qué permite el network slicing?", o:["Cortar cables de red","Crear redes virtuales dedicadas sobre la misma infraestructura","Aumentar el número de antenas","Guardar datos en la nube"], a:1,
   e:"Por ejemplo, una «rebanada» para los robots y otra para las cámaras, cada una con prestaciones garantizadas."},
- {q:"El edge computing reduce la latencia porque…", o:["Usa fibra óptica","Cifra todos los datos","Procesa los datos cerca de la máquina","Usa más ancho de banda"], a:2,
+ {img:"img/q6_edge.svg", q:"El edge computing reduce la latencia porque…", o:["Usa fibra óptica","Cifra todos los datos","Procesa los datos cerca de la máquina","Usa más ancho de banda"], a:2,
   e:"Procesar en el borde evita enviar el dato lejos: decisión en milisegundos."},
- {q:"Massive MIMO consiste en…", o:["Usar muchas antenas para más capacidad y cobertura","Mezclar redes 4G y 5G","Un tipo de sensor industrial","Una nube privada"], a:0,
+ {img:"img/q7_mimo.svg", q:"Massive MIMO consiste en…", o:["Usar muchas antenas para más capacidad y cobertura","Mezclar redes 4G y 5G","Un tipo de sensor industrial","Una nube privada"], a:0,
   e:"Muchas antenas de transmisión y recepción: más capacidad y mejor cobertura."},
- {q:"Si el 4G tiene unos 50 ms de latencia y el 5G 1 ms, ¿cuántas veces es menor en 5G?", o:["10 veces","50 veces","5 veces","1000 veces"], a:1,
+ {img:"img/q8_4g5g.svg", q:"Si el 4G tiene unos 50 ms de latencia y el 5G 1 ms, ¿cuántas veces es menor en 5G?", o:["10 veces","50 veces","5 veces","1000 veces"], a:1,
   e:"50 ms / 1 ms = 50 veces. Son valores teóricos aproximados; en la práctica dependen de banda y red."},
- {q:"¿Qué ventaja principal da una red 5G privada (campus) a una empresa?", o:["Es gratis","Funciona sin antenas","Control propio de cobertura, seguridad y calidad de servicio","Sustituye a los sensores"], a:2,
+ {img:"img/q9_privada.svg", q:"¿Qué ventaja principal da una red 5G privada (campus) a una empresa?", o:["Es gratis","Funciona sin antenas","Control propio de cobertura, seguridad y calidad de servicio","Sustituye a los sensores"], a:2,
   e:"Los datos se quedan en la planta y la empresa decide cobertura, seguridad y QoS."},
- {q:"¿Cuál es el flujo correcto del dato en una fábrica conectada?", o:[
+ {img:"img/q10_flujo.svg", q:"¿Cuál es el flujo correcto del dato en una fábrica conectada?", o:[
    "Nube → Edge → Red 5G → Máquinas",
    "Máquinas y sensores → Red 5G privada → Edge computing → Nube / MES / ERP",
    "Máquinas → Nube → Edge → Red 5G",
@@ -177,6 +180,7 @@ function answersOf(g, q) { return (g.answers || {})[q] || {}; }
 function counts(g, q) {
   const c = [0, 0, 0, 0]; Object.values(answersOf(g, q)).forEach(a => { if (a.c >= 0 && a.c < 4) c[a.c]++; }); return c;
 }
+function imgHTML(q) { return q.img ? `<img class="qimg" src="${esc(q.img)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ""; }
 function optsHTML(q, {counts: c, reveal, total} = {}) {
   return `<div class="opts">` + q.o.map((t, i) => {
     const cls = `opt c${i}` + (reveal ? (i === q.a ? " right" : " dim") : "");
@@ -250,14 +254,14 @@ function renderHost(g) {
     app.innerHTML = head + `<div class="card" style="margin-top:16px">
       <div class="row spread"><span class="muted">Pregunta ${st.q + 1} / ${QUESTIONS.length}</span><span class="big" id="sec">${LIMIT}</span></div>
       <div class="timer"><i id="bar"></i></div>
-      <div class="qtext">${esc(q.q)}</div>${optsHTML(q)}
+      <div class="qtext">${esc(q.q)}</div>${imgHTML(q)}${optsHTML(q)}
       <div class="row spread" style="margin-top:16px"><span class="chip">Respuestas: ${a} / ${n}</span>
       <button onclick="H.reveal()">Mostrar resultado</button></div></div>`;
     tick();
   } else { // reveal
     app.innerHTML = head + `<div class="card" style="margin-top:16px">
       <span class="muted">Pregunta ${st.q + 1} / ${QUESTIONS.length}</span>
-      <div class="qtext">${esc(q.q)}</div>${optsHTML(q, {counts: c, reveal: true, total: a || 1})}
+      <div class="qtext">${esc(q.q)}</div>${imgHTML(q)}${optsHTML(q, {counts: c, reveal: true, total: a || 1})}
       <p style="margin:16px 0"><b class="good">✔ ${esc(q.o[q.a])}.</b> ${esc(q.e)}</p>
       <div class="row spread"><h3>Clasificación</h3>
       <button onclick="H.next()">${st.q + 1 < QUESTIONS.length ? "Siguiente pregunta ▶" : "Ver resultados finales 🏆"}</button></div>
@@ -313,7 +317,7 @@ function renderPlayer(g) {
         <p class="big">${SHAPES[mine.c]}</p><p class="muted">Espera al resultado…</p></div>`;
     } else {
       html = `<div class="card"><div class="row spread"><span class="muted">Pregunta ${st.q + 1} / ${QUESTIONS.length}</span><b id="sec">${LIMIT}</b></div>
-        <div class="timer"><i id="bar"></i></div><div class="qtext" style="font-size:1.3rem">${esc(q.q)}</div>
+        <div class="timer"><i id="bar"></i></div><div class="qtext" style="font-size:1.3rem">${esc(q.q)}</div>${imgHTML(q)}
         <div class="opts">${q.o.map((t, i) => `<button class="opt c${i}" onclick="P.answer(${i})"><span class="sh">${SHAPES[i]}</span><span>${esc(t)}</span></button>`).join("")}</div></div>`;
     }
   } else if (st.status === "reveal") {
