@@ -9,4 +9,7 @@
 //   projectId: "mi-proyecto",
 //   appId: "1:123:web:abc"
 // };
-window.FIREBASE_CONFIG = null;
+   window.FIREBASE_CONFIG = {
+     databaseURL: "https://juego5g-default-rtdb.europe-west1.firebasedatabase.app",
+     projectId: "juego5g"
+   };
