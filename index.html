@@ -76,6 +76,7 @@ td,th{padding:8px;text-align:left;border-bottom:1px solid #243158}
 <script src="firebase-config.js" onerror="window.FIREBASE_CONFIG=null"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" onerror="void 0"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js" onerror="void 0"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js" onerror="void 0"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" onerror="void 0"></script>
 <script>
 /* ======================= PREGUNTAS (basadas en la presentación y el guion) ======================= */
@@ -146,6 +147,28 @@ let G = {};               // último estado conocido
 let viewKey = "";         // para no re-renderizar innecesariamente en jugador
 const app = $("#app");
 
+// Login de administrador (solo en la vista #host y solo si hay apiKey en la configuración)
+let AUTH = null, authUser = true; // true = sin login (modo demo o sin apiKey)
+if (isHost && useFB && window.FIREBASE_CONFIG.apiKey && firebase.auth) {
+  AUTH = firebase.auth(); authUser = undefined; // undefined = comprobando sesión
+  AUTH.onAuthStateChanged(u => { authUser = u; viewKey = ""; renderHost(G); });
+}
+function renderLogin() {
+  if (viewKey === "login") return; viewKey = "login";
+  app.innerHTML = `<div class="center brand" style="margin:30px 0 14px">5G <b>FÁBRICA</b> CHALLENGE</div>
+    <form class="card" style="max-width:420px;margin:0 auto" onsubmit="H.login(event)">
+    <h2>Acceso del presentador</h2><p class="muted">Solo tú puedes iniciar y reiniciar el juego.</p>
+    <p><input id="em" type="email" placeholder="Correo" autocomplete="username" required></p>
+    <p><input id="pw" type="password" placeholder="Contraseña" autocomplete="current-password" required></p>
+    <p id="err" class="badc" style="min-height:1.2em"></p>
+    <button style="width:100%">Entrar</button></form>`;
+}
+function login(ev) {
+  ev.preventDefault();
+  AUTH.signInWithEmailAndPassword($("#em").value.trim(), $("#pw").value)
+    .catch(() => { $("#err").textContent = "Correo o contraseña incorrectos."; });
+}
+
 function ranking(g) {
   return Object.entries(g.players || {}).map(([id, p]) => ({id, name: p.name, score: p.score || 0, pts: p.pts || 0}))
     .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
@@ -200,12 +223,15 @@ function next() {
   if (q < QUESTIONS.length) startQuestion(q); else DB.set("state", {status: "end", q: G.state.q, t0: 0});
 }
 function resetGame() { if (confirm("¿Borrar jugadores y resultados y volver al lobby?")) { revealedFor = -1; DB.set("", {state: {status: "lobby"}}); } }
-window.H = {start: () => startQuestion(0), reveal, next, resetGame};
+window.H = {start: () => startQuestion(0), reveal, next, resetGame, login, logout: () => AUTH && AUTH.signOut()};
 
 function renderHost(g) {
+  if (authUser === undefined) { app.innerHTML = '<p class="center muted" style="margin-top:40px">Cargando…</p>'; return; }
+  if (!authUser) return renderLogin();
   const st = g.state || {status: "lobby"}, list = ranking(g), n = list.length;
   const head = `<div class="row spread"><div class="brand">5G <b>FÁBRICA</b> CHALLENGE</div>
-    <div class="row"><span class="chip">👥 ${n} jugadores</span>${useFB ? "" : '<span class="badge">MODO DEMO (sin Firebase)</span>'}</div></div>`;
+    <div class="row"><span class="chip">👥 ${n} jugadores</span>${useFB ? "" : '<span class="badge">MODO DEMO (sin Firebase)</span>'}
+    ${AUTH ? '<button class="ghost" style="padding:6px 12px" onclick="H.logout()">Salir</button>' : ""}</div></div>`;
   if (st.status === "lobby") {
     const url = location.origin + location.pathname;
     app.innerHTML = head + `<div class="card center" style="margin-top:16px">
