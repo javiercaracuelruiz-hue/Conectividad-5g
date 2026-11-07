@@ -10,6 +10,9 @@
 //   appId: "1:123:web:abc"
 // };
    window.FIREBASE_CONFIG = {
+     apiKey: "AIzaSyDLc7_ldbe7do1eLoKrP9nAw8G8qegdaTQ",
+     authDomain: "juego5g.firebaseapp.com",
      databaseURL: "https://juego5g-default-rtdb.europe-west1.firebasedatabase.app",
-     projectId: "juego5g"
+     projectId: "juego5g",
+     appId: "1:1001120857530:web:1b723cd49397ca133b7183"
    };
