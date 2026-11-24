@@ -67,8 +67,35 @@ td,th{padding:8px;text-align:left;border-bottom:1px solid #243158}
 .bar i{display:block;height:100%;background:var(--ok)}
 .badge{display:inline-block;padding:3px 10px;border-radius:99px;background:#3b2a0a;color:#fbbf24;font-size:.8rem;font-weight:700}
 .good{color:var(--ok)}.badc{color:var(--bad)}
+.fab{background:var(--panel);border:1px solid #243158;border-radius:16px;padding:12px 16px;margin-top:12px}
+.stns{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin-top:8px}
+.stn{border-radius:10px;padding:6px 2px;text-align:center;background:#0d1530;border:2px solid #243158;font-size:1.4rem;line-height:1.1}
+.stn small{display:block;font-size:.7rem;font-weight:800;min-height:1em}
+.stn.off{opacity:.35;filter:grayscale(1)}
+.stn.on{border-color:var(--accent);animation:pl 1s infinite alternate}
+.stn.ok{border-color:var(--ok);background:#0f2a1c}
+.stn.warn{border-color:#f59e0b;background:#2c2208}
+.stn.bad{border-color:var(--bad);background:#2d0f12}
+.stn.bad::after{content:"AVERÍA";display:block;font-size:.55rem;color:var(--bad);font-weight:800}
+.fab.mini .stn{font-size:1rem}
+@keyframes pl{to{box-shadow:0 0 14px var(--accent)}}
+.pws{display:flex;gap:8px;margin:10px 0}
+.pw{flex:1;padding:10px 6px;font-size:.9rem;background:var(--panel2);color:var(--text);border:2px solid #2d3a66}
+.pw.on{background:var(--accent2);color:#1a0820;border-color:#fff}
+.arena{position:relative;height:clamp(330px,58vh,540px);margin-top:12px;border-radius:14px;overflow:hidden;border:2px solid #243158;
+  background:repeating-linear-gradient(90deg,#0d1530 0 48px,#101a38 48px 96px)}
+.gate{position:absolute;left:0;top:0;bottom:0;width:8%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.8rem;font-weight:800;color:var(--muted);background:rgba(255,255,255,.06);border-right:3px dashed #2d3a66}
+.zone{position:absolute;left:74%;width:26%;height:25%;display:flex;align-items:center;gap:8px;padding:6px 10px;color:#fff;font-weight:700;font-size:clamp(.7rem,1.5vw,1.15rem);overflow:hidden;border-bottom:2px solid rgba(0,0,0,.35)}
+.zone.c0{background:var(--c0)}.zone.c1{background:var(--c1)}.zone.c2{background:var(--c2)}.zone.c3{background:var(--c3)}
+.zone .sh{font-size:1.5rem;flex:none}.zone .cnt{margin-left:auto;font-size:1.5rem;font-weight:800}
+.zone.dim{opacity:.35}.zone.right{box-shadow:inset 0 0 0 5px #fff}
+.doll{position:absolute;left:4%;top:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;line-height:1}
+.doll .em{display:block;font-size:clamp(1.2rem,2.6vw,2rem)}
+.doll i{display:block;font-style:normal;font-size:.6rem;font-weight:700;background:#000a;border-radius:6px;padding:0 4px;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.doll.ok .em{filter:drop-shadow(0 0 8px var(--ok))}.doll.ko{opacity:.4}
+.opt.sel{outline:4px solid #fff}
 @media (max-width:640px){.opts{grid-template-columns:1fr}.opt{min-height:68px}}
-@media (prefers-reduced-motion:reduce){.timer>i{transition:none}}
+@media (prefers-reduced-motion:reduce){.stn.on{animation:none}.timer>i{transition:none}}
 </style>
 </head>
 <body>
@@ -86,7 +113,7 @@ const LIMIT = 20; // segundos por pregunta
 // Recomendado: subir las imágenes a una carpeta "img" del repositorio, así no dependen de otra web.
 const QUESTIONS = [
  {img:"img/q1_latencia.svg", q:"¿Cuál es la latencia mínima teórica del 5G?", o:["50 ms","10 ms","1 ms","100 ms"], a:2,
-  e:"El estándar IMT-2020 fija hasta 1 ms de latencia: clave para controlar procesos en tiempo real."},
+  e:"El estándar IMT-2020 fija hasta 1 ms (el 4G ronda los 50 ms, unas 50 veces más). Valores teóricos: clave para controlar procesos en tiempo real."},
  {img:"img/q2_generaciones.svg", q:"¿Qué generación fue la primera pensada también para conectar máquinas, no solo personas?", o:["3G","4G","2G","5G"], a:3,
   e:"El 5G pasa de conectar personas a conectar procesos productivos (comunicaciones máquina a máquina)."},
  {img:"img/q3_robot.svg", q:"Un robot colaborativo que necesita control en tiempo real y muy fiable usa el pilar…", o:["eMBB","URLLC","mMTC","MIMO"], a:1,
@@ -99,8 +126,8 @@ const QUESTIONS = [
   e:"Procesar en el borde evita enviar el dato lejos: decisión en milisegundos."},
  {img:"img/q7_mimo.svg", q:"Massive MIMO consiste en…", o:["Usar muchas antenas para más capacidad y cobertura","Mezclar redes 4G y 5G","Un tipo de sensor industrial","Una nube privada"], a:0,
   e:"Muchas antenas de transmisión y recepción: más capacidad y mejor cobertura."},
- {img:"img/q8_4g5g.svg", q:"Si el 4G tiene unos 50 ms de latencia y el 5G 1 ms, ¿cuántas veces es menor en 5G?", o:["10 veces","50 veces","5 veces","1000 veces"], a:1,
-  e:"50 ms / 1 ms = 50 veces. Son valores teóricos aproximados; en la práctica dependen de banda y red."},
+ {q:"¿Cuál de estos es un RETO del 5G industrial (y no una ventaja)?", o:["Latencia ultrabaja","Ciberseguridad de la nueva superficie de ataque","Menos cables en planta","Escalabilidad de miles de dispositivos"], a:1,
+  e:"Retos: coste y espectro, ciberseguridad, cobertura en interiores e integración con sistemas existentes. Lo demás son ventajas."},
  {img:"img/q9_privada.svg", q:"¿Qué ventaja principal da una red 5G privada (campus) a una empresa?", o:["Es gratis","Funciona sin antenas","Control propio de cobertura, seguridad y calidad de servicio","Sustituye a los sensores"], a:2,
   e:"Los datos se quedan en la planta y la empresa decide cobertura, seguridad y QoS."},
  {img:"img/q10_flujo.svg", q:"¿Cuál es el flujo correcto del dato en una fábrica conectada?", o:[
@@ -111,6 +138,35 @@ const QUESTIONS = [
   e:"Del sensor a la decisión en milisegundos, y de ahí a la gestión (MES / ERP)."}
 ];
 const SHAPES = ["▲","◆","●","■"];
+const AV = ["🦊","🐼","🐸","🐵","🦁","🐯","🐙","🦄","🐧","🐰","🐻","🐱"];
+const V = 0.1, ASP = 0.5; // velocidad (anchos de arena por segundo) y proporción alto/ancho
+const hs = (id, k) => { let h = 7; for (const c of id + k) h = (h * 31 + c.charCodeAt(0)) % 997; return h / 997; };
+const startOf = id => ({x: 0.04, y: 0.1 + 0.8 * hs(id, "y")});
+const tgtOf = (z, id) => ({x: 0.8 + 0.15 * hs(id, "x"), y: z * 0.25 + 0.04 + 0.17 * hs(id, "z")});
+const dist = (r, T) => Math.hypot(T.x - r.x, (T.y - r.y) * ASP);
+const arrT = (r, id) => r.t + dist(r, tgtOf(r.z, id)) / V * 1000; // instante de llegada (ms)
+function posAt(r, id, q, tt) {
+  if (!r || r.q !== q || r.z < 0) return startOf(id);
+  const T = tgtOf(r.z, id), d = dist(r, T), f = d ? Math.min(1, Math.max(0, (tt - r.t) / 1000 * V / d)) : 1;
+  return {x: r.x + (T.x - r.x) * f, y: r.y + (T.y - r.y) * f, mv: f < 1};
+}
+function arenaHTML(g, q, reveal, c) {
+  const ans = answersOf(g, g.state.q);
+  const dolls = Object.entries(g.players || {}).map(([id, p]) =>
+    `<div class="doll${reveal ? (ans[id] && ans[id].c === q.a ? " ok" : " ko") : ""}" data-id="${id}"><span class="em">${AV[Math.floor(hs(id, "a") * AV.length)]}</span><i>${esc(p.name)}</i></div>`).join("");
+  const zones = q.o.map((t, i) => `<div class="zone c${i}${reveal ? (i === q.a ? " right" : " dim") : ""}" style="top:${i * 25}%"><span class="sh">${SHAPES[i]}</span><span>${esc(t)}</span>${reveal ? `<span class="cnt">${c[i]}</span>` : ""}</div>`).join("");
+  return `${reveal ? "" : '<p class="muted" style="margin:0">Elige en tu móvil: tu muñeco corre solo. Puedes cambiar de idea, pero perderás tiempo.</p>'}<div class="arena" id="arena"><div class="gate">🚦<br>SALIDA</div>${zones}${dolls}</div>`;
+}
+function placeDolls() {
+  const st = G.state, ar = $("#arena"); if (!ar || !st || (st.status !== "question" && st.status !== "reveal")) return;
+  const tt = st.status === "question" ? DB.now() : (st.te || st.t0 + LIMIT * 1000);
+  ar.querySelectorAll(".doll").forEach(el => {
+    const id = el.dataset.id, p = (G.players || {})[id], pos = posAt(p && p.run, id, st.q, tt);
+    el.style.left = pos.x * 100 + "%"; el.style.top = pos.y * 100 + "%";
+    el.firstChild.style.transform = pos.mv ? `translateY(${-Math.abs(Math.sin(Date.now() / 90)) * 8}px)` : "";
+  });
+}
+const ICONS = ["⏱️","📶","🤖","🌡️","🍰","🖥️","📡","⚡","🏭","🔗"]; // una estación de la fábrica por pregunta
 
 /* ======================= CAPA DE DATOS (Firebase o modo demo local) ======================= */
 const useFB = !!(window.FIREBASE_CONFIG && window.firebase);
@@ -173,7 +229,7 @@ function login(ev) {
 }
 
 function ranking(g) {
-  return Object.entries(g.players || {}).map(([id, p]) => ({id, name: p.name, score: p.score || 0, pts: p.pts || 0}))
+  return Object.entries(g.players || {}).map(([id, p]) => ({id, name: p.name, score: p.score || 0, pts: p.pts || 0, streak: p.streak || 0}))
     .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
 }
 function answersOf(g, q) { return (g.answers || {})[q] || {}; }
@@ -190,8 +246,21 @@ function optsHTML(q, {counts: c, reveal, total} = {}) {
 }
 function leaderHTML(list, n, meId) {
   return `<ol class="lb">` + list.slice(0, n).map((p, i) =>
-    `<li class="${p.id === meId ? "me" : ""}"><span class="pos">${i + 1}</span><span class="nm">${esc(p.name)}</span>` +
+    `<li class="${p.id === meId ? "me" : ""}"><span class="pos">${i + 1}</span><span class="nm">${esc(p.name)}</span>${p.streak >= 2 ? '<span class="gain">🔥' + p.streak + '</span>' : ""}` +
     `${p.pts ? `<span class="gain">+${p.pts}</span>` : ""}<span class="pt">${p.score}</span></li>`).join("") + `</ol>`;
+}
+function factoryHTML(g, mini) {
+  const st = g.state || {}; let sum = 0, k = 0;
+  const cells = QUESTIONS.map((q, i) => {
+    const done = st.status === "end" || i < st.q || (i === st.q && st.status === "reveal");
+    let cls = "off", lab = "";
+    if (done) {
+      const ans = answersOf(g, i), t = Object.keys(ans).length, ok = Object.values(ans).filter(a => a.c === q.a).length, p = t ? Math.round(100 * ok / t) : 0;
+      sum += p; k++; cls = p >= 60 ? "ok" : p >= 35 ? "warn" : "bad"; lab = p + "%";
+    } else if (i === st.q) cls = "on";
+    return `<div class="stn ${cls}">${ICONS[i]}<small>${lab}</small></div>`;
+  }).join("");
+  return `<div class="fab${mini ? " mini" : ""}"><div class="row spread"><b>🏭 Fábrica de la clase: cada acierto colectivo enciende una estación</b><span class="chip">Producción ${k ? Math.round(sum / k) : 0}%</span></div><div class="stns">${cells}</div></div>`;
 }
 function tick() {
   const st = G.state; if (!st || st.status !== "question") return;
@@ -200,6 +269,11 @@ function tick() {
   if (bar) bar.style.width = (100 * left / LIMIT) + "%";
   if (sec) sec.textContent = Math.ceil(left);
   if (isHost) autoReveal(left);
+  const e = $("#eta"), me = (G.players || {})[pid];
+  if (!isHost && e && me && me.run && me.run.q === st.q && me.run.z >= 0) {
+    const sec = (arrT(me.run, pid) - DB.now()) / 1000, late = arrT(me.run, pid) > st.t0 + LIMIT * 1000;
+    e.textContent = (sec > 0 ? `🏃 Corriendo a ${SHAPES[me.run.z]} · llegas en ${sec.toFixed(1)} s` : `📍 Ya estás en ${SHAPES[me.run.z]}`) + (late && sec > 0 ? " ⚠ no llegas a tiempo" : "");
+  }
 }
 setInterval(tick, 250);
 
@@ -207,20 +281,30 @@ setInterval(tick, 250);
 let revealedFor = -1;
 function autoReveal(left) {
   const st = G.state, n = Object.keys(G.players || {}).length, a = Object.keys(answersOf(G, st.q)).length;
-  if ((left <= 0 || (n > 0 && a >= n)) && revealedFor !== st.q) reveal();
+  if (left <= 0 && revealedFor !== st.q) reveal();
 }
 function startQuestion(i) { revealedFor = -1; DB.set("state", {status: "question", q: i, t0: DB.now()}); }
 function reveal() {
   const st = G.state; if (!st || st.status !== "question" || revealedFor === st.q) return;
   revealedFor = st.q;
-  const q = QUESTIONS[st.q], ans = answersOf(G, st.q);
+  const q = QUESTIONS[st.q], te = Math.min(DB.now(), st.t0 + LIMIT * 1000);
   Object.entries(G.players || {}).forEach(([id, p]) => {
-    const a = ans[id]; let pts = 0;
-    if (a && a.c === q.a) pts = Math.round(500 + 500 * (1 - Math.min(Math.max(a.ms, 0), LIMIT * 1000) / (LIMIT * 1000)));
+    const r = p.run, run = !!(r && r.q === st.q && r.z >= 0), arr = run ? arrT(r, id) - st.t0 : 0;
+    const ok = run && r.z === q.a && arr <= te - st.t0, a = {ms: arr, h: run && r.h, x2: run && r.x2}; let pts = 0;
+    DB.set(`answers/${st.q}/${id}`, {c: ok ? r.z : -1, ms: arr}); // c=-1: no llegó a la correcta a tiempo
+    if (ok) {
+      pts = 500 + 500 * (1 - Math.min(Math.max(a.ms, 0), LIMIT * 1000) / (LIMIT * 1000));
+      if (a.h) pts *= 0.5;                       // 50/50 = mitad de puntos
+      if (a.x2) pts *= 2;                        // comodín x2
+      pts *= 1 + 0.25 * Math.min(p.streak || 0, 4); // racha: +25% por acierto seguido (máx +100%)
+      if (st.q === QUESTIONS.length - 1) pts *= 2;  // pregunta final x2
+      pts = Math.round(pts);
+    }
+    DB.set(`players/${id}/streak`, ok ? (p.streak || 0) + 1 : 0);
     DB.set(`players/${id}/pts`, pts);
     DB.set(`players/${id}/score`, (p.score || 0) + pts);
   });
-  DB.set("state", {status: "reveal", q: st.q, t0: st.t0});
+  DB.set("state", {status: "reveal", q: st.q, t0: st.t0, te});
 }
 function next() {
   const q = G.state.q + 1;
@@ -233,9 +317,10 @@ function renderHost(g) {
   if (authUser === undefined) { app.innerHTML = '<p class="center muted" style="margin-top:40px">Cargando…</p>'; return; }
   if (!authUser) return renderLogin();
   const st = g.state || {status: "lobby"}, list = ranking(g), n = list.length;
-  const head = `<div class="row spread"><div class="brand">5G <b>FÁBRICA</b> CHALLENGE</div>
+  let head = `<div class="row spread"><div class="brand">5G <b>FÁBRICA</b> CHALLENGE</div>
     <div class="row"><span class="chip">👥 ${n} jugadores</span>${useFB ? "" : '<span class="badge">MODO DEMO (sin Firebase)</span>'}
     ${AUTH ? '<button class="ghost" style="padding:6px 12px" onclick="H.logout()">Salir</button>' : ""}</div></div>`;
+  if (st.status !== "lobby") head += factoryHTML(g);
   if (st.status === "lobby") {
     const url = location.origin + location.pathname;
     app.innerHTML = head + `<div class="card center" style="margin-top:16px">
@@ -252,16 +337,16 @@ function renderHost(g) {
   const q = QUESTIONS[st.q], c = counts(g, st.q), a = Object.keys(answersOf(g, st.q)).length;
   if (st.status === "question") {
     app.innerHTML = head + `<div class="card" style="margin-top:16px">
-      <div class="row spread"><span class="muted">Pregunta ${st.q + 1} / ${QUESTIONS.length}</span><span class="big" id="sec">${LIMIT}</span></div>
+      <div class="row spread"><span class="muted">Pregunta ${st.q + 1} / ${QUESTIONS.length}${st.q + 1 === QUESTIONS.length ? ' <span class="badge">¡FINAL ×2 PUNTOS!</span>' : ""}</span><span class="big" id="sec">${LIMIT}</span></div>
       <div class="timer"><i id="bar"></i></div>
-      <div class="qtext">${esc(q.q)}</div>${imgHTML(q)}${optsHTML(q)}
-      <div class="row spread" style="margin-top:16px"><span class="chip">Respuestas: ${a} / ${n}</span>
+      <div class="qtext">${esc(q.q)}</div>${arenaHTML(g, q, false)}
+      <div class="row spread" style="margin-top:16px"><span class="chip">🏃 ${n} corredores</span>
       <button onclick="H.reveal()">Mostrar resultado</button></div></div>`;
     tick();
   } else { // reveal
     app.innerHTML = head + `<div class="card" style="margin-top:16px">
       <span class="muted">Pregunta ${st.q + 1} / ${QUESTIONS.length}</span>
-      <div class="qtext">${esc(q.q)}</div>${imgHTML(q)}${optsHTML(q, {counts: c, reveal: true, total: a || 1})}
+      <div class="qtext">${esc(q.q)}</div>${arenaHTML(g, q, true, c)}
       <p style="margin:16px 0"><b class="good">✔ ${esc(q.o[q.a])}.</b> ${esc(q.e)}</p>
       <div class="row spread"><h3>Clasificación</h3>
       <button onclick="H.next()">${st.q + 1 < QUESTIONS.length ? "Siguiente pregunta ▶" : "Ver resultados finales 🏆"}</button></div>
@@ -288,14 +373,26 @@ if (!pid) { pid = "p" + Math.random().toString(36).slice(2, 10); try { localStor
 function join() {
   const name = $("#nm").value.trim().slice(0, 16); if (!name) return $("#nm").focus();
   try { localStorage.setItem("g5name", name); } catch (e) {}
-  DB.set("players/" + pid, {name, score: 0, pts: 0});
+  DB.set("players/" + pid, {name, score: 0, pts: 0, streak: 0});
 }
 function answer(i) {
   const st = G.state; if (!st || st.status !== "question") return;
-  if (answersOf(G, st.q)[pid]) return;
-  DB.set(`answers/${st.q}/${pid}`, {c: i, ms: Math.max(0, DB.now() - st.t0)});
 }
-window.P = {join, answer};
+function go(z) {
+  const st = G.state, now = DB.now(); if (!st || st.status !== "question" || now > st.t0 + LIMIT * 1000) return;
+  const me = (G.players || {})[pid] || {}, A = armOf(st.q), cur = posAt(me.run, pid, st.q, now);
+  DB.set(`players/${pid}/run`, {x: cur.x, y: cur.y, t: now, z, q: st.q, x2: A.x2, h: A.h});
+  if (A.x2) DB.set(`players/${pid}/pu/x2`, 1);
+  if (A.h) DB.set(`players/${pid}/pu/h`, 1);
+}
+let ARM = {q: -1, x2: 0, h: 0};
+const armOf = q => ARM.q === q ? ARM : {x2: 0, h: 0};
+function arm(k) {
+  const st = G.state; if (!st || st.status !== "question") return;
+  if (ARM.q !== st.q) ARM = {q: st.q, x2: 0, h: 0};
+  ARM[k] = ARM[k] ? 0 : 1; renderPlayer(G);
+}
+window.P = {join, go, arm};
 
 function renderPlayer(g) {
   const me = (g.players || {})[pid], st = g.state || {status: "lobby"};
@@ -308,26 +405,29 @@ function renderPlayer(g) {
       <input id="nm" maxlength="16" placeholder="Tu nombre" value="${esc(saved)}" autocomplete="off">
       <p><button style="width:100%" onclick="P.join()">Entrar al juego</button></p></div>`;
   } else if (st.status === "lobby") {
-    key = "wait"; html = `<div class="card center"><h2>¡Dentro, ${esc(me.name)}!</h2><p class="muted">Espera a que el presentador empiece…</p><p class="big">📡</p></div>`;
+    key = "wait"; html = `<div class="card center"><h2>¡Dentro, ${esc(me.name)}!</h2><p class="muted">Espera a que el presentador empiece…</p><p>Cuando salga la pregunta, toca la respuesta que creas correcta: tu muñeco correrá hasta allí. Si no llegas a tiempo, no puntúas.</p><p>Tienes 2 comodines de un solo uso:<br><b>🔥 x2</b> duplica tus puntos · <b>✂ 50/50</b> quita 2 opciones (mitad de puntos).<br>Acertar seguido sube tu racha 🔥 (+25% cada vez).</p><p class="big">📡</p></div>`;
   } else if (st.status === "question") {
     const q = QUESTIONS[st.q], mine = answersOf(g, st.q)[pid];
-    key = `q${st.q}:${mine ? "a" + mine.c : "n"}`;
-    if (mine) {
+    const A = armOf(st.q), pu = me.pu || {}, runZ = me.run && me.run.q === st.q ? me.run.z : -1; let hid = [];
+    if (A.h) { const w = [0, 1, 2, 3].filter(i => i !== q.a), k = (st.q + pid.charCodeAt(1)) % 3; hid = [w[k], w[(k + 1) % 3]]; }
+    key = `q${st.q}:${runZ}:${A.x2}${A.h}:${pu.x2 || 0}${pu.h || 0}`;
+    if (false) {
       html = `<div class="card center"><h2>Respuesta enviada</h2><p class="muted">Pregunta ${st.q + 1} / ${QUESTIONS.length}</p>
         <p class="big">${SHAPES[mine.c]}</p><p class="muted">Espera al resultado…</p></div>`;
     } else {
       html = `<div class="card"><div class="row spread"><span class="muted">Pregunta ${st.q + 1} / ${QUESTIONS.length}</span><b id="sec">${LIMIT}</b></div>
         <div class="timer"><i id="bar"></i></div><div class="qtext" style="font-size:1.3rem">${esc(q.q)}</div>${imgHTML(q)}
-        <div class="opts">${q.o.map((t, i) => `<button class="opt c${i}" onclick="P.answer(${i})"><span class="sh">${SHAPES[i]}</span><span>${esc(t)}</span></button>`).join("")}</div></div>`;
+        <p class="muted center" id="eta" style="margin:6px 0">Toca una respuesta y tu muñeco echa a correr 🏃</p><div class="pws"><button class="pw ${A.x2 ? "on" : ""}" ${pu.x2 ? "disabled" : ""} onclick="P.arm('x2')">🔥 x2 puntos</button><button class="pw ${A.h ? "on" : ""}" ${pu.h ? "disabled" : ""} onclick="P.arm('h')">✂ 50/50 (½ puntos)</button></div>
+        <div class="opts">${q.o.map((t, i) => hid.includes(i) ? `<button class="opt c${i}" disabled><span class="sh">${SHAPES[i]}</span></button>` : `<button class="opt c${i}${runZ === i ? " sel" : ""}" onclick="P.go(${i})"><span class="sh">${SHAPES[i]}</span><span>${esc(t)}</span></button>`).join("")}</div></div>`;
     }
   } else if (st.status === "reveal") {
     const q = QUESTIONS[st.q], mine = answersOf(g, st.q)[pid], ok = mine && mine.c === q.a;
     const list = ranking(g), pos = list.findIndex(p => p.id === pid) + 1;
     key = `r${st.q}:${me.score}`;
     html = `<div class="card center"><p class="big">${mine ? (ok ? "✅" : "❌") : "⏱️"}</p>
-      <h2 class="${ok ? "good" : "badc"}">${mine ? (ok ? "¡Correcto! +" + me.pts : "Incorrecto") : "Sin respuesta"}</h2>
+      <h2 class="${ok ? "good" : "badc"}">${mine ? (ok ? "¡Correcto! +" + me.pts : "No llegaste a la correcta") : "Sin respuesta"}</h2>
       <p class="muted">Respuesta correcta: <b style="color:var(--text)">${esc(q.o[q.a])}</b></p>
-      <p>${esc(q.e)}</p><p><span class="chip">Puesto ${pos}º</span> <span class="chip">${me.score} pts</span></p></div>`;
+      <p>${esc(q.e)}</p><p><span class="chip">Puesto ${pos}º</span> <span class="chip">${me.score} pts</span>${me.streak >= 2 ? ' <span class="chip">🔥 racha ' + me.streak + '</span>' : ""}</p>${factoryHTML(g, 1)}</div>`;
   } else {
     const list = ranking(g), pos = list.findIndex(p => p.id === pid) + 1;
     key = "end:" + me.score;
@@ -340,7 +440,8 @@ function renderPlayer(g) {
 
 /* ======================= ARRANQUE ======================= */
 if (isHost && !useFB) console.info("Modo demo: sin firebase-config.js los datos solo se comparten entre pestañas del mismo navegador.");
-DB.sub(g => { G = g; isHost ? renderHost(g) : renderPlayer(g); });
+DB.sub(g => { G = g; isHost ? renderHost(g) : renderPlayer(g); if (isHost) placeDolls(); });
+if (isHost) (function loop() { placeDolls(); requestAnimationFrame(loop); })();
 window.addEventListener("hashchange", () => location.reload());
 </script>
 </body>
