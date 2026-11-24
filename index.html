@@ -90,7 +90,9 @@ td,th{padding:8px;text-align:left;border-bottom:1px solid #243158}
 .zone .sh{font-size:1.5rem;flex:none}.zone .cnt{margin-left:auto;font-size:1.5rem;font-weight:800}
 .zone.dim{opacity:.35}.zone.right{box-shadow:inset 0 0 0 5px #fff}
 .doll{position:absolute;left:4%;top:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;line-height:1}
-.doll .em{display:block;font-size:clamp(1.2rem,2.6vw,2rem)}
+.doll .em{display:block}.doll .em svg{display:block;width:clamp(28px,3.6vw,46px);height:auto;margin:0 auto}
+.sw{width:36px;height:36px;padding:0;border-radius:50%;border:3px solid transparent}.sw.on{border-color:#fff;transform:scale(1.15)}
+#ci{width:40px;height:40px;padding:0;border:0;background:none;border-radius:50%}
 .doll i{display:block;font-style:normal;font-size:.6rem;font-weight:700;background:#000a;border-radius:6px;padding:0 4px;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .doll.ok .em{filter:drop-shadow(0 0 8px var(--ok))}.doll.ko{opacity:.4}
 .opt.sel{outline:4px solid #fff}
@@ -108,7 +110,7 @@ td,th{padding:8px;text-align:left;border-bottom:1px solid #243158}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" onerror="void 0"></script>
 <script>
 /* ======================= PREGUNTAS (basadas en la presentación y el guion) ======================= */
-const LIMIT = 20; // segundos por pregunta
+const LIMIT = 30; // segundos por pregunta (los muñecos tardan ~9 s en cruzar la arena)
 // Cada pregunta puede llevar una imagen opcional: img:"https://..." (enlace de internet) o img:"img/latencia.jpg" (archivo subido al repositorio).
 // Recomendado: subir las imágenes a una carpeta "img" del repositorio, así no dependen de otra web.
 const QUESTIONS = [
@@ -138,7 +140,10 @@ const QUESTIONS = [
   e:"Del sensor a la decisión en milisegundos, y de ahí a la gestión (MES / ERP)."}
 ];
 const SHAPES = ["▲","◆","●","■"];
-const AV = ["🦊","🐼","🐸","🐵","🦁","🐯","🐙","🦄","🐧","🐰","🐻","🐱"];
+const COLS = ["#ef4444","#f97316","#facc15","#22c55e","#06b6d4","#3b82f6","#a855f7","#ec4899"];
+const HEX = /^#[0-9a-f]{6}$/i;
+const okCol = (c, id) => HEX.test(c || "") ? c : COLS[Math.floor(hs(id, "a") * COLS.length)];
+const dollSVG = c => `<svg viewBox="0 0 44 56" xmlns="http://www.w3.org/2000/svg"><rect x="13" y="49" width="7" height="6" rx="2" fill="#1e293b"/><rect x="24" y="49" width="7" height="6" rx="2" fill="#1e293b"/><rect x="14" y="38" width="16" height="13" rx="4" fill="${c}" stroke="#0008" stroke-width="2"/><circle cx="22" cy="20" r="19" fill="${c}" stroke="#0008" stroke-width="2.5"/><circle cx="14.5" cy="18" r="5.2" fill="#fff"/><circle cx="29.5" cy="18" r="5.2" fill="#fff"/><circle cx="16" cy="19" r="2.5" fill="#111"/><circle cx="31" cy="19" r="2.5" fill="#111"/><path d="M14 27q8 7 16 0" fill="none" stroke="#111" stroke-width="2.4" stroke-linecap="round"/></svg>`;
 const V = 0.1, ASP = 0.5; // velocidad (anchos de arena por segundo) y proporción alto/ancho
 const hs = (id, k) => { let h = 7; for (const c of id + k) h = (h * 31 + c.charCodeAt(0)) % 997; return h / 997; };
 const startOf = id => ({x: 0.04, y: 0.1 + 0.8 * hs(id, "y")});
@@ -153,7 +158,7 @@ function posAt(r, id, q, tt) {
 function arenaHTML(g, q, reveal, c) {
   const ans = answersOf(g, g.state.q);
   const dolls = Object.entries(g.players || {}).map(([id, p]) =>
-    `<div class="doll${reveal ? (ans[id] && ans[id].c === q.a ? " ok" : " ko") : ""}" data-id="${id}"><span class="em">${AV[Math.floor(hs(id, "a") * AV.length)]}</span><i>${esc(p.name)}</i></div>`).join("");
+    `<div class="doll${reveal ? (ans[id] && ans[id].c === q.a ? " ok" : " ko") : ""}" data-id="${id}"><span class="em">${dollSVG(okCol(p.col, id))}</span><i>${esc(p.name)}</i></div>`).join("");
   const zones = q.o.map((t, i) => `<div class="zone c${i}${reveal ? (i === q.a ? " right" : " dim") : ""}" style="top:${i * 25}%"><span class="sh">${SHAPES[i]}</span><span>${esc(t)}</span>${reveal ? `<span class="cnt">${c[i]}</span>` : ""}</div>`).join("");
   return `${reveal ? "" : '<p class="muted" style="margin:0">Elige en tu móvil: tu muñeco corre solo. Puedes cambiar de idea, pero perderás tiempo.</p>'}<div class="arena" id="arena"><div class="gate">🚦<br>SALIDA</div>${zones}${dolls}</div>`;
 }
@@ -229,7 +234,7 @@ function login(ev) {
 }
 
 function ranking(g) {
-  return Object.entries(g.players || {}).map(([id, p]) => ({id, name: p.name, score: p.score || 0, pts: p.pts || 0, streak: p.streak || 0}))
+  return Object.entries(g.players || {}).map(([id, p]) => ({id, name: p.name, score: p.score || 0, pts: p.pts || 0, streak: p.streak || 0, col: p.col}))
     .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
 }
 function answersOf(g, q) { return (g.answers || {})[q] || {}; }
@@ -328,7 +333,7 @@ function renderHost(g) {
       <p class="muted">Abre este enlace en tu móvil o escanea el QR</p>
       <div class="qr" id="qr"></div>
       <p class="url" style="font-size:1.3rem">${esc(url)}</p>
-      <div class="chips">${list.map(p => `<span class="chip">${esc(p.name)}</span>`).join("") || '<span class="muted">Esperando jugadores…</span>'}</div>
+      <div class="chips">${list.map(p => `<span class="chip"><span style="display:inline-block;width:20px;vertical-align:middle">${dollSVG(okCol(p.col, p.id))}</span> ${esc(p.name)}</span>`).join("") || '<span class="muted">Esperando jugadores…</span>'}</div>
       <p style="margin-top:20px"><button ${n ? "" : "disabled"} onclick="H.start()">▶ Empezar (${QUESTIONS.length} preguntas)</button></p></div>`;
     if (window.QRCode) new QRCode($("#qr"), {text: url, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M});
     return;
@@ -370,10 +375,17 @@ function renderEnd(g, head, list) {
 let pid = null;
 try { pid = localStorage.getItem("g5pid"); } catch (e) {}
 if (!pid) { pid = "p" + Math.random().toString(36).slice(2, 10); try { localStorage.setItem("g5pid", pid); } catch (e) {} }
+let PCOL = null; try { PCOL = localStorage.getItem("g5col"); } catch (e) {}
+PCOL = HEX.test(PCOL || "") ? PCOL : okCol(null, pid);
+function pickCol(c) {
+  if (!HEX.test(c)) return; PCOL = c; try { localStorage.setItem("g5col", c); } catch (e) {}
+  const pv = $("#pv"); if (pv) pv.innerHTML = dollSVG(c);
+  document.querySelectorAll(".sw").forEach(b => b.classList.toggle("on", b.dataset.c === c));
+}
 function join() {
   const name = $("#nm").value.trim().slice(0, 16); if (!name) return $("#nm").focus();
   try { localStorage.setItem("g5name", name); } catch (e) {}
-  DB.set("players/" + pid, {name, score: 0, pts: 0, streak: 0});
+  DB.set("players/" + pid, {name, score: 0, pts: 0, streak: 0, col: PCOL});
 }
 function answer(i) {
   const st = G.state; if (!st || st.status !== "question") return;
@@ -392,7 +404,7 @@ function arm(k) {
   if (ARM.q !== st.q) ARM = {q: st.q, x2: 0, h: 0};
   ARM[k] = ARM[k] ? 0 : 1; renderPlayer(G);
 }
-window.P = {join, go, arm};
+window.P = {join, go, arm, pickCol};
 
 function renderPlayer(g) {
   const me = (g.players || {})[pid], st = g.state || {status: "lobby"};
@@ -403,9 +415,12 @@ function renderPlayer(g) {
     let saved = ""; try { saved = localStorage.getItem("g5name") || ""; } catch (e) {}
     html = `<div class="card"><h2>¿Cómo te llamas?</h2><p class="muted">Pon un nombre o apodo para el ranking.</p>
       <input id="nm" maxlength="16" placeholder="Tu nombre" value="${esc(saved)}" autocomplete="off">
+      <p class="muted" style="margin:14px 0 6px">Elige el color de tu personaje</p>
+      <div class="row" style="justify-content:center;flex-wrap:nowrap"><div id="pv" style="width:64px;flex:none">${dollSVG(PCOL)}</div>
+      <div class="chips" style="margin:0;max-width:250px;align-items:center">${COLS.map(c => `<button class="sw${c === PCOL ? " on" : ""}" data-c="${c}" style="background:${c}" onclick="P.pickCol('${c}')" aria-label="Color ${c}"></button>`).join("")}<input id="ci" type="color" value="${PCOL}" oninput="P.pickCol(this.value)" aria-label="Otro color"></div></div>
       <p><button style="width:100%" onclick="P.join()">Entrar al juego</button></p></div>`;
   } else if (st.status === "lobby") {
-    key = "wait"; html = `<div class="card center"><h2>¡Dentro, ${esc(me.name)}!</h2><p class="muted">Espera a que el presentador empiece…</p><p>Cuando salga la pregunta, toca la respuesta que creas correcta: tu muñeco correrá hasta allí. Si no llegas a tiempo, no puntúas.</p><p>Tienes 2 comodines de un solo uso:<br><b>🔥 x2</b> duplica tus puntos · <b>✂ 50/50</b> quita 2 opciones (mitad de puntos).<br>Acertar seguido sube tu racha 🔥 (+25% cada vez).</p><p class="big">📡</p></div>`;
+    key = "wait"; html = `<div class="card center"><div style="width:90px;margin:0 auto">${dollSVG(okCol(me.col, pid))}</div><h2>¡Dentro, ${esc(me.name)}!</h2><p class="muted">Espera a que el presentador empiece…</p><p>Cuando salga la pregunta, toca la respuesta que creas correcta: tu muñeco correrá hasta allí. Si no llegas a tiempo, no puntúas.</p><p>Tienes 2 comodines de un solo uso:<br><b>🔥 x2</b> duplica tus puntos · <b>✂ 50/50</b> quita 2 opciones (mitad de puntos).<br>Acertar seguido sube tu racha 🔥 (+25% cada vez).</p><p class="big">📡</p></div>`;
   } else if (st.status === "question") {
     const q = QUESTIONS[st.q], mine = answersOf(g, st.q)[pid];
     const A = armOf(st.q), pu = me.pu || {}, runZ = me.run && me.run.q === st.q ? me.run.z : -1; let hid = [];
